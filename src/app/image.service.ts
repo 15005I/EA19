@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Firestore, collection, addDoc, deleteDoc, doc, collectionData } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
 
 export interface Image {
   id?: string;
@@ -9,26 +10,23 @@ export interface Image {
 @Injectable({
   providedIn: 'root'
 })
-
 export class ImageService {
-  private images: Image[] = [];
+  private collectionPath = 'images';
+
+  constructor(private firestore: Firestore) {}
 
   getImages(): Observable<Image[]> {
-    return of(this.images);
+    const imagesCollection = collection(this.firestore, this.collectionPath);
+    return collectionData(imagesCollection, { idField: 'id' }) as Observable<Image[]>;
   }
 
   addImage(image: Image): Promise<void> {
-    image.id = this.generateId();
-    this.images.push(image);
-    return Promise.resolve();
+    const imagesCollection = collection(this.firestore, this.collectionPath);
+    return addDoc(imagesCollection, image).then(() => {});
   }
 
   deleteImage(id: string): Promise<void> {
-    this.images = this.images.filter(image => image.id !== id);
-    return Promise.resolve();
-  }
-
-  private generateId(): string {
-    return Math.random().toString(36).substr(2, 9);
+    const imageDoc = doc(this.firestore, `${this.collectionPath}/${id}`);
+    return deleteDoc(imageDoc);
   }
 }

@@ -20,7 +20,7 @@
     <div class="container" style="background-color: rgb(141, 141, 141);">
       <div class="gallery">
         <div *ngFor="let image of images$ | async" class="gallery-item">
-          <img [src]="image.url" alt="Imagen" style="width: 100%; height: auto;">
+          <img [src]="image.url" alt="Imagen" style="width: 10%; height: auto;">
           <button (click)="deleteImage(image.id)">Eliminar</button>
         </div>
       </div>
