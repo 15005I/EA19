@@ -1,20 +1,29 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+  <div style="height: 100vh; background-color: rgb(122, 122, 122);">
+    <header style="background-color: rgb(0, 0, 0); padding: 20px;">
+      <h1 class="ion-text-center" style="color: rgb(255, 255, 255);">Galería de Imágenes</h1>
+    </header>
+    <br>
+    <div>
+      <ion-button (click)="navigateToLogin()">Login</ion-button>
+      <ion-button (click)="navigateToSignUp()">Sign Up</ion-button>
+    </div>
+    <form (ngSubmit)="addImage(imageUrl)" #form="ngForm">
+      <div>
+        <label for="imageUrl">URL de la Imagen</label>
+        <input id="imageUrl" name="imageUrl" [(ngModel)]="imageUrl" required #imageUrlInput="ngModel">
+        <div *ngIf="imageUrlInput.invalid && imageUrlInput.touched" style="color: red;">Por favor, ingrese una URL.</div>
+      </div>
+      <button type="submit" [disabled]="form.invalid">Agregar Imagen</button>
+    </form>
+    <br><br><br>
+    <div class="container" style="background-color: rgb(141, 141, 141);">
+      <div class="gallery">
+        <div *ngFor="let image of images$ | async" class="gallery-item">
+          <img [src]="image.url" alt="Imagen" style="width: 100%; height: auto;">
+          <button (click)="deleteImage(image.id)">Eliminar</button>
+        </div>
+      </div>
+    </div>
   </div>
 </ion-content>
