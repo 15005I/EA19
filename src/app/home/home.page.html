@@ -1,27 +1,35 @@
 <ion-content [fullscreen]="true">
-  <div style="height: 100vh; background-color: rgb(122, 122, 122);">
-    <header style="background-color: rgb(0, 0, 0); padding: 20px;">
-      <h1 class="ion-text-center" style="color: rgb(255, 255, 255);">Galería de Imágenes</h1>
+  <div class="content-wrapper">
+    <header class="header">
+      <h1 class="title">Galería de Imágenes</h1>
     </header>
-    <br>
-    <div>
+    <div class="button-group">
       <ion-button (click)="navigateToLogin()">Login</ion-button>
       <ion-button (click)="navigateToSignUp()">Sign Up</ion-button>
+      <ion-button *ngIf="user" (click)="logout()">Logout</ion-button>
     </div>
-    <form (ngSubmit)="addImage(imageUrl)" #form="ngForm">
-      <div>
-        <label for="imageUrl">URL de la Imagen</label>
-        <input id="imageUrl" name="imageUrl" [(ngModel)]="imageUrl" required #imageUrlInput="ngModel">
-        <div *ngIf="imageUrlInput.invalid && imageUrlInput.touched" style="color: red;">Por favor, ingrese una URL.</div>
-      </div>
-      <button type="submit" [disabled]="form.invalid">Agregar Imagen</button>
-    </form>
-    <br><br><br>
-    <div class="container" style="background-color: rgb(141, 141, 141);">
+    <div *ngIf="user; else notLoggedIn" class="form-container">
+      <form (ngSubmit)="addImage(imageUrl)" #form="ngForm">
+        <div class="form-group">
+          <label for="imageUrl">URL de la Imagen</label>
+          <input id="imageUrl" name="imageUrl" [(ngModel)]="imageUrl" required #imageUrlInput="ngModel">
+          <div *ngIf="imageUrlInput.invalid && imageUrlInput.touched" class="error-message">Por favor, ingrese una URL.</div>
+        </div>
+        <button type="submit" [disabled]="form.invalid">Agregar Imagen</button>
+      </form>
+    </div>
+    <ng-template #notLoggedIn>
+      <p class="login-message">Debes estar logueado para añadir imágenes.</p>
+    </ng-template>
+    <div class="gallery-container">
       <div class="gallery">
         <div *ngFor="let image of images$ | async" class="gallery-item">
-          <img [src]="image.url" alt="Imagen" style="width: 10%; height: auto;">
-          <button (click)="deleteImage(image.id)">Eliminar</button>
+          <img [src]="image.url" alt="Imagen">
+          <div class="image-info">
+            <p>Fecha añadida: {{ image.dateAdded | date:'short' }}</p>
+            <p>Añadido por: {{ image.userEmail }}</p>
+            <button (click)="deleteImage(image.id)">Eliminar</button>
+          </div>
         </div>
       </div>
     </div>

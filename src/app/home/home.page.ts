@@ -7,6 +7,8 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Image, ImageService } from '../image.service';
 import { Observable } from 'rxjs';
+import { Auth, onAuthStateChanged, User } from '@angular/fire/auth';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-home',
@@ -18,11 +20,15 @@ import { Observable } from 'rxjs';
 export class HomePage implements OnInit {
   images$!: Observable<Image[]>;
   imageUrl: string = '';
+  user: User | null = null;
 
-  constructor(private router: Router, private imageService: ImageService){}
+  constructor(private router: Router, private imageService: ImageService, private auth: Auth, private authService: AuthService) {}
 
   ngOnInit() {
     this.getImages();
+    onAuthStateChanged(this.auth, (user) => {
+      this.user = user;
+    });
   }
 
   getImages() {
@@ -30,12 +36,16 @@ export class HomePage implements OnInit {
   }
 
   addImage(imageUrl: string) {
-    if (imageUrl) {
-      const newImage: Image = { url: imageUrl };
-      this.imageService.addImage(newImage).then(() => {
-        this.getImages(); 
-        this.imageUrl = ''; 
-      });
+    if (this.user) {
+      if (imageUrl) {
+        const newImage: Image = { url: imageUrl, userEmail: this.user.email || '' };
+        this.imageService.addImage(newImage).then(() => {
+          this.getImages();
+          this.imageUrl = '';
+        });
+      }
+    } else {
+      this.router.navigate(['/sign-up']);
     }
   }
 
@@ -53,5 +63,11 @@ export class HomePage implements OnInit {
 
   navigateToSignUp(){
       this.router.navigate(["/sign-up"]);
+  }
+
+  logout() {
+    this.authService.logout().then(() => {
+      this.router.navigate(['/login']);
+    });
   }
 }
